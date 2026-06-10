@@ -1,44 +1,30 @@
 import { Page, Locator } from '@playwright/test';
 
 export class LoginPage {
-  // 1. Definimos los tipos de nuestras variables usando TypeScript
   readonly page: Page;
-  readonly botonInicialSignIn: Locator;
   readonly campoEmail: Locator;
   readonly campoPassword: Locator;
-  readonly botonSubmitSignIn: Locator;
-  readonly botonSave: Locator;
+  readonly botonLogin: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    // 2. Centralizamos los selectores en un solo lugar
-    this.botonSave = page.locator('text=Save');
-    this.botonInicialSignIn =  page.getByRole('button', { name: 'Sign in' })
-    this.campoEmail = page.getByRole('textbox', { name: /email/i });
-    this.campoPassword = page.locator('input[type="password"], input[name="Password"]').first();
-    this.botonSubmitSignIn = page.getByRole('button', { name: /Sign in/i });
+    // Selectores limpios para el eCommerce Playground
+    this.campoEmail = page.locator('#input-email');
+    this.campoPassword = page.locator('#input-password');
+    this.botonLogin = page.getByRole('button', { name: 'Login' });
   }
 
-  // 3. Creamos un método para navegar a la URL
   async navegar() {
-    await this.page.goto('https://base.ironridge.com/');
+    // URL directa a la pantalla de Login del eCommerce de práctica
+    await this.page.goto('https://ecommerce-playground.lambdatest.io/index.php?route=account/login');
   }
 
-  // 4. Encapsulamos el flujo del login con el combo de estabilidad que descubrimos
   async iniciarSesion(correo: string, contrasenia: string) {
-    await this.botonSave.click();
-    await this.botonInicialSignIn.click();
-    await this.page.waitForLoadState('networkidle');
-
-    // Esperamos y escribimos el correo emulando el teclado humano
-    await this.campoEmail.waitFor({ state: 'visible', timeout: 15000 });
-    await this.campoEmail.pressSequentially(correo, { delay: 50 });
-
-    // Contraseña
+    await this.campoEmail.waitFor({ state: 'visible' });
+    await this.campoEmail.fill(correo);
+    
     await this.campoPassword.waitFor({ state: 'visible' });
     await this.campoPassword.fill(contrasenia);
 
-    // Clic final
-    await this.botonSubmitSignIn.click();
-  }
-}
+    await this.botonLogin.click();
+  }}
